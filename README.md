@@ -11,7 +11,7 @@ A GDPR Compliant Recruiting and Staffing Node JS application for Human Resources
 * [Download Docker images](http://hyperledger-fabric.readthedocs.io/en/latest/samples.html#binaries)
 
 ```
-cd fabric-samples/Staff-Chain/
+cd /Staff-Chain/
 ```
 
 Once you have completed the above setup, you will have provisioned a local network with the following docker container configuration:
