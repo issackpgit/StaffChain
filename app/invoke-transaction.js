@@ -1,18 +1,3 @@
-/**
- * Copyright 2017 IBM All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
 'use strict';
 var path = require('path');
 var fs = require('fs');
@@ -20,13 +5,16 @@ var util = require('util');
 var hfc = require('fabric-client');
 var helper = require('./helper.js');
 var logger = helper.getLogger('invoke-chaincode');
+var crypto = require('crypto');
+var MongoClient = require('mongodb').MongoClient;
+var db1 = require('./db.js');
+var url = "mongodb://localhost:27017/";
 
 var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn, args, username, org_name) {
 	logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
 	var error_message = null;
 	var tx_id_string = null;
 	try {
-		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
 		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
 		var channel = client.getChannel(channelName);
@@ -36,10 +24,24 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 			throw new Error(message);
 		}
 		var tx_id = client.newTransactionID();
-		// will need the transaction ID string for the event registration later
 		tx_id_string = tx_id.getTransactionID();
 
-		// send proposal to endorser
+		var data = args[0]+"-->";
+		for(var i =1;i<args.length;i++){
+			data+=args[i]+" ";
+		}
+		var secret = 'abcdefg';
+		var hashargs = crypto.createHmac('sha256', secret)
+		                   .update(data)
+		                   .digest('hex');
+
+		logger.info('Hashargs : '+hashargs);
+
+		var idata = { id: args[0], data: data}
+		logger.info("Userid :"+ idata);
+
+    await db1.insertRecord(url,idata);
+
 		var request = {
 			targets: peerNames,
 			chaincodeId: chaincodeName,
@@ -49,6 +51,9 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 			txId: tx_id
 		};
 
+
+		logger.info("Issac test");
+		logger.info(request);
 		let results = await channel.sendTransactionProposal(request);
 
 		// the returned object has both the endorsement results
