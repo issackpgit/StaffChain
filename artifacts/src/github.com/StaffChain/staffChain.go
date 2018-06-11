@@ -24,6 +24,11 @@ type Employee struct {
     CurEmployer string `json:"curEmployer"`
 }
 
+type Data struct {
+    Id string `json:"id"`
+    HashArgs string `json:"hashargs"`
+    Url string `json:"url"`
+}
 //###################################
 
 type Person struct {
@@ -69,6 +74,9 @@ func (t* staffChain) Invoke(stub shim.ChaincodeStubInterface) pp.Response{
     if function =="Query"{
       return t.Query(stub, args)
     }
+    if function =="CreateUserGDPR"{
+      return t.CreateUserGDPR(stub, args)
+    }
 
     logger.Errorf("Unknown action, check the first argument, must be 'CreateUser'. But got: %v", args[0])
     return shim.Error("Invalid function name....")
@@ -82,6 +90,20 @@ func (t* staffChain) CreateUser(stub shim.ChaincodeStubInterface, args []string)
     var emp = Employee{Name: args[1],DOB : args[2], CurEmployer : args[3]}
     empAsBytes,_ := json.Marshal(emp)
     stub.PutState(args[0],empAsBytes)
+
+    return shim.Success(nil)
+}
+
+func (t* staffChain) CreateUserGDPR(stub shim.ChaincodeStubInterface, args []string) pp.Response {
+
+  if len(args) != 3 {
+    return shim.Error("Incorrect number of arguments. Expecting 3")
+  }
+
+    var data = Data{HashArgs: args[1], Url : args[2]}
+    // var emp = Employee{HashArgs: args[1], Url : args[2]}
+    datAsBytes,_ := json.Marshal(data)
+    stub.PutState(args[0],datAsBytes)
 
     return shim.Success(nil)
 }

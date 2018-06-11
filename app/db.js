@@ -50,15 +50,20 @@ async function insertRecord (url,myobj) {
 // });
 
 //Query data
-// MongoClient.connect(url, function(err, db) {
-//   if (err) throw err;
-//   var dbo = db.db("mydb");
-//   var query = { name: "Issac" };
-//   dbo.collection("customers").find(query).toArray(function(err, result) {
-//     if (err) throw err;
-//     console.log(result);
-//     db.close();
-//   });
-// });
+async function queryRecord (url,query) {
+  logger.info("inside query record");
 
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("mydb");
+
+    dbo.collection("EmpDB").find(query).toArray(function(err, result) {
+      if (err) throw err;
+        console.log(result);
+        db.close();
+    });
+  });
+  logger.info("out query record");
+}
 exports.insertRecord = insertRecord;
+exports.queryRecord = queryRecord;

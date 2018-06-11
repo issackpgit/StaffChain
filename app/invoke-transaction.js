@@ -46,25 +46,17 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 			targets: peerNames,
 			chaincodeId: chaincodeName,
 			fcn: fcn,
-			args: args,
+			args: [args[0],hashargs,url],
 			chainId: channelName,
 			txId: tx_id
 		};
-
 
 		logger.info("Issac test");
 		logger.info(request);
 		let results = await channel.sendTransactionProposal(request);
 
-		// the returned object has both the endorsement results
-		// and the actual proposal, the proposal will be needed
-		// later when we send a transaction to the orderer
 		var proposalResponses = results[0];
 		var proposal = results[1];
-
-		// lets have a look at the responses to see if they are
-		// all good, if good they will also include signatures
-		// required to be committed
 		var all_good = true;
 		for (var i in proposalResponses) {
 			let one_good = false;
@@ -84,8 +76,6 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 				proposalResponses[0].response.status, proposalResponses[0].response.message,
 				proposalResponses[0].response.payload, proposalResponses[0].endorsement.signature));
 
-			// wait for the channel-based event hub to tell us
-			// that the commit was good or bad on each peer in our organization
 			var promises = [];
 			let event_hubs = channel.getChannelEventHubsForOrg();
 			event_hubs.forEach((eh) => {
@@ -115,10 +105,6 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 						logger.error(err);
 						reject(err);
 					},
-						// the default for 'unregister' is true for transaction listeners
-						// so no real need to set here, however for 'disconnect'
-						// the default is false as most event hubs are long running
-						// in this use case we are using it only once
 						{unregister: true, disconnect: true}
 					);
 					eh.connect();
@@ -132,8 +118,6 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 				proposal: proposal
 			};
 			var sendPromise = channel.sendTransaction(orderer_request);
-			// put the send to the orderer last so that the events get registered and
-			// are ready for the orderering and committing
 			promises.push(sendPromise);
 			let results = await Promise.all(promises);
 			logger.debug(util.format('------->>> R E S P O N S E : %j', results));
@@ -145,7 +129,6 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 				logger.debug(error_message);
 			}
 
-			// now see what each of the event hubs reported
 			for(let i in results) {
 				let event_hub_result = results[i];
 				let event_hub = event_hubs[i];
