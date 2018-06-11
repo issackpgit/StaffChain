@@ -34,21 +34,21 @@ var url = "mongodb://localhost:27017/";
 // });
 
 // Find one
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  var dbo = db.db("mydb");
-  dbo.collection("customers").findOne({}, function(err, result) {
-    if (err) throw err;
-    console.log(result);
-    db.close();
-  });
-});
+// MongoClient.connect(url, function(err, db) {
+//   if (err) throw err;
+//   var dbo = db.db("mydb");
+//   dbo.collection("customers").findOne({}, function(err, result) {
+//     if (err) throw err;
+//     console.log(result);
+//     db.close();
+//   });
+// });
 
 //Query data
 MongoClient.connect(url, function(err, db) {
   if (err) throw err;
   var dbo = db.db("mydb");
-  var query = { address: "Highway 37" };
+  var query = { name: "Issac" };
   dbo.collection("customers").find(query).toArray(function(err, result) {
     if (err) throw err;
     console.log(result);
