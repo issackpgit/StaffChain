@@ -3,14 +3,14 @@ package main
 import(
   "fmt"
   "strconv"
-  "log"
+  // "log"
   "encoding/json"
 
   "github.com/hyperledger/fabric/core/chaincode/shim"
   pp "github.com/hyperledger/fabric/protos/peer"
 
-  "gopkg.in/mgo.v2"
-  "gopkg.in/mgo.v2/bson"
+  // "gopkg.in/mgo.v2"
+  // "gopkg.in/mgo.v2/bson"
 )
 
 var logger = shim.NewLogger("staffChain0")
@@ -97,30 +97,6 @@ func (t* staffChain) Query(stub shim.ChaincodeStubInterface, args []string) pp.R
 
 
 func main() {
-
-  session, err := mgo.Dial("mongodb://localhost:27017/")
-  if err!=nil {
-    panic(err)
-  }
-  defer session.Close()
-
-  c := session.DB("mydb").C("customers")
-  err = c.Insert(&Person{"Issac","+17167172300"},
-                &Person{"Resh","+919745948690"})
-
-  if err != nil{
-    log.Fatal(err)
-  }
-
-
-  result := Person{}
-  err = c.Find(bson.M{"name":"Issac"}).One(&result)
-  if err!=nil {
-    log.Fatal(err)
-  }
-
-  fmt.Println("Phone:",result.Phone)
-
   err1 := shim.Start(new(staffChain))
   if err1 != nil {
     logger.Errorf("Error starting the staffChain: %s", err1)
