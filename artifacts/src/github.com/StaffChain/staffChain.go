@@ -36,9 +36,6 @@ type Person struct {
     Phone string
 }
 
-
-
-
 // ####################################
 
 
@@ -100,7 +97,7 @@ func (t* staffChain) CreateUserGDPR(stub shim.ChaincodeStubInterface, args []str
     return shim.Error("Incorrect number of arguments. Expecting 3")
   }
 
-    var data = Data{HashArgs: args[1], Url : args[2]}
+    var data = Data{Id: args[0],HashArgs: args[1], Url : args[2]}
     // var emp = Employee{HashArgs: args[1], Url : args[2]}
     datAsBytes,_ := json.Marshal(data)
     stub.PutState(args[0],datAsBytes)

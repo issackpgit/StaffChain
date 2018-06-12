@@ -4,10 +4,11 @@ var util = require('util');
 var hfc = require('fabric-client');
 var helper = require('./helper.js');
 var logger = helper.getLogger('Query');
+var db = require('./db.js');
+var url = "mongodb://localhost:27017/";
 
 var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn, username, org_name) {
 	try {
-		// first setup the client for this org
 		var client = await helper.getClientForOrg(org_name, username);
 		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
 		var channel = client.getChannel(channelName);
@@ -19,14 +20,31 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 
 		// send query
 		var request = {
-			targets : [peer], //queryByChaincode allows for multiple targets
+			targets : [peer],
 			chaincodeId: chaincodeName,
 			fcn: fcn,
 			args: args
 		};
 
-
 		let response_payloads = await channel.queryByChaincode(request);
+		logger.info("Payload:"+response_payloads);
+
+		var jsonData = JSON.parse(response_payloads);
+
+		// logger.info("Data:"+data.hashargs);
+
+		var url = jsonData.url;
+
+		var query = {id:args[0]};
+
+		var result = await db.queryRecord(url,query, function(err,data1){
+			logger.info("Inside callback :"+data1);
+			if(err) return console.error(err);
+			var jsonResult = JSON.parse(data1);
+			logger.info("Name :"+jsonResult);
+		});
+
+
 		if (response_payloads) {
 			logger.info('Payload Length : '+response_payloads.length);
 			for (let i = 0; i < response_payloads.length; i++) {

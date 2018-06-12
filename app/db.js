@@ -50,20 +50,19 @@ async function insertRecord (url,myobj) {
 // });
 
 //Query data
-async function queryRecord (url,query) {
+async function queryRecord (url,query,callback) {
   logger.info("inside query record");
-
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     var dbo = db.db("mydb");
-
     dbo.collection("EmpDB").find(query).toArray(function(err, result) {
       if (err) throw err;
-        console.log(result);
+        callback(result);
         db.close();
     });
   });
   logger.info("out query record");
 }
+
 exports.insertRecord = insertRecord;
 exports.queryRecord = queryRecord;
