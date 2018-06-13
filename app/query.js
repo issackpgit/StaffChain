@@ -30,20 +30,16 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 		logger.info("Payload:"+response_payloads);
 
 		var jsonData = JSON.parse(response_payloads);
-
-		// logger.info("Data:"+data.hashargs);
-
 		var url = jsonData.url;
-
 		var query = {id:args[0]};
-
-		var result = await db.queryRecord(url,query, function(err,data1){
-			logger.info("Inside callback :"+data1);
-			if(err) return console.error(err);
-			var jsonResult = JSON.parse(data1);
-			logger.info("Name :"+jsonResult);
+		var result = db.queryRecord(url,query, function(data){
+			logger.info("Inside callback");
+			console.log(data.length);
+			result = data;
 		});
 
+		logger.info("After callback :"+result[0]);
+		console.log(result);
 
 		if (response_payloads) {
 			logger.info('Payload Length : '+response_payloads.length);
