@@ -49,16 +49,6 @@ async function insertRecord (url,myobj) {
 //   });
 // });
 
-
-//Query test
-async function queryRecord1(url, query){
-  logger.debug('queryRecord = *** START');
-    MongoClient.connect(url, function(err, db) {
-      if (err) throw err;
-      logger.debug('queryRecord = *** MID');
-
-    });
-}
 //Query data
 async function queryRecord (url,query,callback) {
   logger.info("inside query record");
