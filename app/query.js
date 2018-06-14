@@ -32,25 +32,28 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 		var jsonData = JSON.parse(response_payloads);
 		var url = jsonData.url;
 		var query = {id:args[0]};
+
 		var result = db.queryRecord(url,query, function(data){
 			logger.info("Inside callback");
-			console.log(data.length);
+			console.log(data[0].id);
 			result = data;
 		});
 
-		logger.info("After callback :"+result[0]);
-		console.log(result);
+		console.log('Result'+result);
 
 		if (response_payloads) {
 			logger.info('Payload Length : '+response_payloads.length);
 			for (let i = 0; i < response_payloads.length; i++) {
 				logger.info(args[0]+'\'s details : ' + response_payloads[i].toString('utf8'));
 			}
-			return args[0]+'\'s details : ' + response_payloads[0].toString('utf8');
+			// return args[0]+'\'s details : ' + response_payloads[0].toString('utf8')+'with data '+ data[0].data;
+			return args[0]+'\'s details : data ';//+ data[0].data;
 		} else {
 			logger.error('response_payloads is null');
 			return 'response_payloads is null';
 		}
+
+
 	} catch(error) {
 		logger.error('Failed to query due to error: ' + error.stack ? error.stack : error);
 		return error.toString();

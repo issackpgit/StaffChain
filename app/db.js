@@ -25,7 +25,7 @@ var url = "mongodb://localhost:27017/";
 //Insert record
 async function insertRecord (url,myobj) {
   logger.info("inside insert record");
-  MongoClient.connect(url, function(err, db) {
+    await MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     var dbo = db.db("mydb");
     // var myobj = { name: "Company Inc", address: "Highway 37" };
