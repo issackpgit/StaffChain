@@ -69,4 +69,3 @@ async function queryRecord (url,query,callback) {
 
 exports.insertRecord = insertRecord;
 exports.queryRecord = queryRecord;
-exports.queryRecord1 = queryRecord1;
