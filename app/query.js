@@ -7,8 +7,9 @@ var logger = helper.getLogger('Query');
 var db = require('./db.js');
 var url = "mongodb://localhost:27017/";
 
-var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn, username, org_name) {
+var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn, username, org_name, callback) {
 	try {
+		logger.debug("Before getClientForOrg");
 		var client = await helper.getClientForOrg(org_name, username);
 		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
 		var channel = client.getChannel(channelName);
@@ -28,37 +29,34 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 
 		let response_payloads = await channel.queryByChaincode(request);
 		logger.info("Payload:"+response_payloads);
-
 		var jsonData = JSON.parse(response_payloads);
 		var url = jsonData.url;
 		var query = {id:args[0]};
 
-		var result = db.queryRecord(url,query, function(data){
+		let result = await db.queryRecord(url,query, async function(data){
 			logger.info("Inside callback");
-			console.log(data[0].id);
+			console.log('ID:'+data[0].id);
 			result = data;
-		});
 
-		console.log('Result'+result);
-
-		if (response_payloads) {
-			logger.info('Payload Length : '+response_payloads.length);
-			for (let i = 0; i < response_payloads.length; i++) {
-				logger.info(args[0]+'\'s details : ' + response_payloads[i].toString('utf8'));
+			if (response_payloads) {
+				logger.info('Payload Length : '+response_payloads.length);
+				for (let i = 0; i < response_payloads.length; i++) {
+					logger.info(args[0]+'\'s details : ' + response_payloads[i].toString('utf8'));
+				}
+				var output = args[0]+'\'s details : ' + response_payloads[0].toString('utf8');
+			} else {
+				logger.error('response_payloads is null');
+				return 'response_payloads is null';
 			}
-			// return args[0]+'\'s details : ' + response_payloads[0].toString('utf8')+'with data '+ data[0].data;
-			return args[0]+'\'s details : data ';//+ data[0].data;
-		} else {
-			logger.error('response_payloads is null');
-			return 'response_payloads is null';
-		}
-
+			callback(data);
+		});
 
 	} catch(error) {
 		logger.error('Failed to query due to error: ' + error.stack ? error.stack : error);
 		return error.toString();
 	}
 };
+
 var getBlockByNumber = async function(peer, channelName, blockNumber, username, org_name) {
 	try {
 		// first setup the client for this org

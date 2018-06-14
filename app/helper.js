@@ -39,10 +39,6 @@ async function getClientForOrg (userorg, username) {
 	// on the settings in the client section of the connection profile
 	await client.initCredentialStores();
 
-	// The getUserContext call tries to get the user from persistence.
-	// If the user has been saved to persistence then that means the user has
-	// been registered and enrolled. If the user is found in persistence
-	// the call will then assign the user to the client object.
 	if(username) {
 		let user = await client.getUserContext(username, true);
 		if(!user) {
@@ -60,13 +56,10 @@ var getRegisteredUser = async function(username, userOrg, isJson) {
 	try {
 		var client = await getClientForOrg(userOrg);
 		logger.debug('Successfully initialized the credential stores');
-			// client can now act as an agent for organization Org1
-			// first check to see if the user is already enrolled
 		var user = await client.getUserContext(username, true);
 		if (user && user.isEnrolled()) {
 			logger.info('Successfully loaded member from persistence');
 		} else {
-			// user was not enrolled, so we will need an admin user object to register
 			logger.info('User %s was not enrolled, so we will need an admin user object to register',username);
 			var admins = hfc.getConfigSetting('admins');
 			let adminUserObj = await client.setUserContext({username: admins[0].username, password: admins[0].secret});
