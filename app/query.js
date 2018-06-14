@@ -5,6 +5,7 @@ var hfc = require('fabric-client');
 var helper = require('./helper.js');
 var logger = helper.getLogger('Query');
 var db = require('./db.js');
+var crypto = require('crypto');
 var url = "mongodb://localhost:27017/";
 
 var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn, username, org_name, callback) {
@@ -31,6 +32,7 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 		logger.info("Payload:"+response_payloads);
 		var jsonData = JSON.parse(response_payloads);
 		var url = jsonData.url;
+		var hashargs = jsonData.hashargs;
 		var query = {id:args[0]};
 
 		let result = await db.queryRecord(url,query, async function(data){
@@ -46,9 +48,21 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 				var output = args[0]+'\'s details : ' + response_payloads[0].toString('utf8');
 			} else {
 				logger.error('response_payloads is null');
-				return 'response_payloads is null';
+				callback('response_payloads is null');
 			}
-			callback(data);
+
+			var secret = 'abcdefg';
+			var hashargs1 = crypto.createHmac('sha256', secret)
+			                   .update(data[0].data)
+			                   .digest('hex');
+
+			console.log(hashargs);
+			console.log(hashargs1);
+			if(hashargs == hashargs1)
+				callback(data);
+			else {
+				callback('Data has been tampered')
+			}
 		});
 
 	} catch(error) {
