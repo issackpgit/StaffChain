@@ -9,6 +9,7 @@ var crypto = require('crypto');
 var MongoClient = require('mongodb').MongoClient;
 var db1 = require('./db.js');
 var url = "mongodb://localhost:27017/";
+var secret = 'abcdefg';
 
 var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn, args, username, org_name) {
 	logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
@@ -30,7 +31,6 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 		for(var i =1;i<args.length;i++){
 			data+=args[i]+" ";
 		}
-		var secret = 'abcdefg';
 		var hashargs = crypto.createHmac('sha256', secret)
 		                   .update(data)
 		                   .digest('hex');

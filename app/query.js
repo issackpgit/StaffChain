@@ -7,6 +7,7 @@ var logger = helper.getLogger('Query');
 var db = require('./db.js');
 var crypto = require('crypto');
 var url = "mongodb://localhost:27017/";
+var secret = 'abcdefg';
 
 var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn, username, org_name, callback) {
 	try {
@@ -51,7 +52,6 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 				callback('response_payloads is null');
 			}
 
-			var secret = 'abcdefg';
 			var hashargs1 = crypto.createHmac('sha256', secret)
 			                   .update(data[0].data)
 			                   .digest('hex');
