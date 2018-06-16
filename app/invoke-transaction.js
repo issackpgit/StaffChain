@@ -27,33 +27,46 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 		var tx_id = client.newTransactionID();
 		tx_id_string = tx_id.getTransactionID();
 
-		var data = args[0]+"-->";
-		for(var i =1;i<args.length;i++){
-			data+=args[i]+" ";
+		if(fcn == "CreateUserGDPR"){
+				logger.info("Insert user code");
+				var data = args[0]+"-->";
+				for(var i =1;i<args.length;i++){
+					data+=args[i]+" ";
+				}
+				var hashargs = crypto.createHmac('sha256', secret)
+				                   .update(data)
+				                   .digest('hex');
+
+				logger.info('Hashargs : '+hashargs);
+				var idata = { id: args[0], data: data}
+				logger.info("Userid :"+ idata);
+		    await db1.insertRecord(url,idata);
 		}
-		var hashargs = crypto.createHmac('sha256', secret)
-		                   .update(data)
-		                   .digest('hex');
+		else {
+				if(fcn == "DeleteUser"){
+				logger.info("Delete user code");
 
-		logger.info('Hashargs : '+hashargs);
+				var myquery = {id : args[0]};
 
-		var idata = { id: args[0], data: data}
-		logger.info("Userid :"+ idata);
+				await db1.deleteRecord(url,myquery);
+				hashargs = "";
+				url = "";
+		}
+	}
 
-    await db1.insertRecord(url,idata);
-
-		var request = {
-			targets: peerNames,
-			chaincodeId: chaincodeName,
-			fcn: fcn,
-			args: [args[0],hashargs,url],
-			chainId: channelName,
-			txId: tx_id
-		};
+	var request = {
+		targets: peerNames,
+		chaincodeId: chaincodeName,
+		fcn: fcn,
+		args: [args[0],hashargs,url],
+		chainId: channelName,
+		txId: tx_id
+	};
 
 		logger.info("Issac test");
 		logger.info(request);
 		let results = await channel.sendTransactionProposal(request);
+
 
 		var proposalResponses = results[0];
 		var proposal = results[1];
@@ -117,6 +130,7 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 				proposalResponses: proposalResponses,
 				proposal: proposal
 			};
+
 			var sendPromise = channel.sendTransaction(orderer_request);
 			promises.push(sendPromise);
 			let results = await Promise.all(promises);
