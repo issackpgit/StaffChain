@@ -8,7 +8,6 @@ var logger = helper.getLogger('invoke-chaincode');
 var crypto = require('crypto');
 var MongoClient = require('mongodb').MongoClient;
 var db1 = require('./db.js');
-var url = "mongodb://localhost:27017/";
 var secret = 'abcdefg';
 
 var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn, args, username, org_name) {
@@ -28,6 +27,7 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 		tx_id_string = tx_id.getTransactionID();
 
 		if(fcn == "CreateUserGDPR"){
+				var url = "mongodb://localhost:27017/";
 				logger.info("Insert user code");
 				var data = args[0]+"-->";
 				for(var i =1;i<args.length;i++){
@@ -43,6 +43,7 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 		    await db1.insertRecord(url,idata);
 		}
 		else {
+				var url = "mongodb://localhost:27017/";
 				if(fcn == "DeleteUser"){
 				logger.info("Delete user code");
 
