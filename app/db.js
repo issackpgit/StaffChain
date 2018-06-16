@@ -22,7 +22,7 @@ var url = "mongodb://localhost:27017/";
 //   });
 // });
 
-//Insert record
+// Insert record
 async function insertRecord (url,myobj) {
   logger.info("inside insert record");
     await MongoClient.connect(url, function(err, db) {
@@ -49,7 +49,7 @@ async function insertRecord (url,myobj) {
 //   });
 // });
 
-//Query data
+// Query data
 async function queryRecord (url,query,callback) {
   logger.info("inside query record");
   MongoClient.connect(url, function(err, db) {
@@ -67,5 +67,37 @@ async function queryRecord (url,query,callback) {
   logger.info("out query record");
 }
 
+//Delete record
+async function deleteRecord(url,myquery){
+  logger.info("inside delete record db.js");
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("mydb");
+    // var myquery = { address: 'Mountain 21' };
+    dbo.collection("EmpDB").deleteOne(myquery, function(err, obj) {
+      if (err) throw err;
+      console.log("1 document deleted");
+      db.close();
+    });
+  });
+}
+
 exports.insertRecord = insertRecord;
 exports.queryRecord = queryRecord;
+exports.deleteRecord = deleteRecord;
+
+//Query Testing
+// MongoClient.connect(url, function(err, db) {
+//   if (err) throw err;
+//   var dbo = db.db("mydb");
+//   var query = { id: "Emp5" };
+//   dbo.collection("EmpDB").find(query).toArray(function(err, result) {
+//     if (err) throw err;
+//     if(result == [])
+//     console.log(result);
+//     else {
+//       console.log("No data, Data has been deleted");
+//     }
+//     db.close();
+//   });
+// });
