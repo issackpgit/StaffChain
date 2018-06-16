@@ -74,6 +74,9 @@ func (t* staffChain) Invoke(stub shim.ChaincodeStubInterface) pp.Response{
     if function =="CreateUserGDPR"{
       return t.CreateUserGDPR(stub, args)
     }
+    if function =="DeleteUser"{
+      return t.DeleteUser(stub, args)
+    }
 
     logger.Errorf("Unknown action, check the first argument, must be 'CreateUser'. But got: %v", args[0])
     return shim.Error("Invalid function name....")
@@ -103,6 +106,13 @@ func (t* staffChain) CreateUserGDPR(stub shim.ChaincodeStubInterface, args []str
     stub.PutState(args[0],datAsBytes)
 
     return shim.Success(nil)
+}
+
+func (t* staffChain) DeleteUser(stub shim.ChaincodeStubInterface, args []string) pp Response){
+  if(len(args) !=1){
+    return shim.Error("Incorrect number of arguments");
+  }
+
 }
 
 func (t* staffChain) Query(stub shim.ChaincodeStubInterface, args []string) pp.Response  {
