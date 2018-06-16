@@ -56,8 +56,10 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 					callback('response_payloads is null');
 				}
 
+				var len = data.length;
+				console.log("Data length "+len);
 				var hashargs1 = crypto.createHmac('sha256', secret)
-				                   .update(data[0].data)
+				                   .update(data[len-1].data)
 				                   .digest('hex');
 
 				console.log(hashargs);
@@ -66,7 +68,7 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 				if(hashargs == hashargs1)
 					callback(data);
 				else {
-					callback('Data has been tampered')
+					callback(data+'Data has been tampered')
 				}
 			});
 }
