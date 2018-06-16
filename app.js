@@ -38,6 +38,7 @@ var install = require('./app/install-chaincode.js');
 var instantiate = require('./app/instantiate-chaincode.js');
 var invoke = require('./app/invoke-transaction.js');
 var query = require('./app/query.js');
+var del = require('./app/delete.js');
 var host = process.env.HOST || hfc.getConfigSetting('host');
 var port = process.env.PORT || hfc.getConfigSetting('port');
 ///////////////////////////////////////////////////////////////////////////////
@@ -326,6 +327,32 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function(req, 
 		res.send(result);
 	});
 });
+
+//Delete data on chaincode
+app.get('/channels/:channelName/chaincodes/:chaincodeName', async function(req, res) {
+	logger.debug('==================== QUERY BY CHAINCODE ==================');
+	var channelName = req.params.channelName;
+	var chaincodeName = req.params.chaincodeName;
+	let args = req.query.args;
+	let fcn = req.query.fcn;
+	let peer = req.query.peer;
+
+
+		logger.debug('channelName : ' + channelName);
+		logger.debug('chaincodeName : ' + chaincodeName);
+		logger.debug('fcn : ' + fcn);
+		logger.debug('args : ' + args);
+
+		args = args.replace(/'/g, '"');
+		args = JSON.parse(args);
+		logger.debug(args);
+
+		await del.deleteChaincodeData(peer, channelName, chaincodeName, args, fcn, req.username, req.orgname, function(result){
+		console.log(result);
+		res.send(result);
+	});
+});
+
 //  Query Get Block by BlockNumber
 app.get('/channels/:channelName/blocks/:blockId', async function(req, res) {
 	logger.debug('==================== GET BLOCK BY NUMBER ==================');
