@@ -328,29 +328,6 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function(req, 
 	});
 });
 
-// //Delete data on chaincode
-// app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req, res) {
-// 	logger.debug('==================== DELETE DATA CHAINCODE ==================');
-// 	var peers = req.body.peers;
-// 	var chaincodeName = req.params.chaincodeName;
-// 	var channelName = req.params.channelName;
-// 	var fcn = req.body.fcn;
-// 	var args = req.body.args;
-//
-//
-// 		logger.debug('channelName : ' + channelName);
-// 		logger.debug('chaincodeName : ' + chaincodeName);
-// 		logger.debug('fcn : ' + fcn);
-// 		logger.debug('args : ' + args);
-//
-// 		logger.debug(args);
-//
-// 		await del.deleteChaincodeData(peer, channelName, chaincodeName, args, fcn, req.username, req.orgname, function(result){
-// 		console.log(result);
-// 		res.send(result);
-// 	});
-// });
-
 //  Query Get Block by BlockNumber
 app.get('/channels/:channelName/blocks/:blockId', async function(req, res) {
 	logger.debug('==================== GET BLOCK BY NUMBER ==================');
