@@ -8,6 +8,9 @@ var db = require('./db.js');
 var crypto = require('crypto');
 var url = "mongodb://localhost:27017/";
 var secret = 'abcdefg';
+var hash = require('object-hash');
+var assert = require('assert');
+
 
 var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn, username, org_name, callback) {
 	try {
@@ -36,6 +39,8 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 		var hashargs = jsonData.hashargs;
 		var query = {id:args[0]};
 
+		// assert.equal(hashargs, hashargs1, "Data has been deleted");
+
 		if(hashargs =="" && url == ""){
 			callback("Data has been deleted");
 		}
@@ -58,9 +63,11 @@ var queryChaincode = async function(peer, channelName, chaincodeName, args, fcn,
 
 				var len = data.length;
 				console.log("Data length "+len);
-				var hashargs1 = crypto.createHmac('sha256', secret)
-				                   .update(data[len-1].data)
-				                   .digest('hex');
+
+				var hashargs1 = hash(data[len-1].data);
+				// var hashargs1 = crypto.createHmac('sha256', secret)
+				//                    .update(data[len-1].data)
+				//                    .digest('hex');
 
 				console.log(hashargs);
 				console.log(hashargs1);

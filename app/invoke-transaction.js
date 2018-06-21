@@ -9,6 +9,8 @@ var crypto = require('crypto');
 var MongoClient = require('mongodb').MongoClient;
 var db1 = require('./db.js');
 var secret = 'abcdefg';
+var hash = require('object-hash');
+
 
 var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn, args, username, org_name) {
 	logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
@@ -29,14 +31,28 @@ var invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn,
 		if(fcn == "CreateUserGDPR"){
 				var url = "mongodb://localhost:27017/";
 				logger.info("Insert user code");
-				var data = args[0]+"-->";
-				for(var i =1;i<args.length;i++){
-					data+=args[i]+" ";
-				}
-				var hashargs = crypto.createHmac('sha256', secret)
-				                   .update(data)
-				                   .digest('hex');
 
+//Data that goes into db
+
+				var data = {
+					EmpId : args[0],
+					Name : args[1],
+					DateOfJoin : args[2],
+					Company : args[3]
+				};
+
+
+				// var data = args[0]+"-->";
+				// for(var i =1;i<args.length;i++){
+				// 	data+=args[i]+" ";
+				// }
+				// var hashargs = crypto.createHmac('sha256', secret)
+				//                    .update(data)
+				//                    .digest('hex');
+
+
+				var hashargs = hash(data);
+				
 				logger.info('Hashargs : '+hashargs);
 				var idata = { id: args[0], data: data}
 				logger.info("Userid :"+ idata);
